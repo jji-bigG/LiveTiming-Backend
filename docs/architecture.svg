@@ -1,0 +1,83 @@
+<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background Grid -->
+    <defs>
+        <pattern id="smallGrid" width="10" height="10" patternUnits="userSpaceOnUse">
+            <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#f0f0f0" stroke-width="0.5"/>
+        </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#smallGrid)"/>
+
+    <!-- EV Sensors -->
+    <g transform="translate(50,50)">
+        <rect x="0" y="0" width="120" height="60" rx="5" fill="#4CAF50" stroke="#2E7D32" stroke-width="2"/>
+        <text x="60" y="35" text-anchor="middle" fill="white" font-family="Arial">EV Sensor 1</text>
+    </g>
+    
+    <g transform="translate(50,150)">
+        <rect x="0" y="0" width="120" height="60" rx="5" fill="#4CAF50" stroke="#2E7D32" stroke-width="2"/>
+        <text x="60" y="25" text-anchor="middle" fill="white" font-family="Arial">EV Sensor 2</text>
+        <text x="60" y="45" text-anchor="middle" fill="white" font-family="Arial">(Temperature)</text>
+    </g>
+    
+    <g transform="translate(50,250)">
+        <rect x="0" y="0" width="120" height="60" rx="5" fill="#4CAF50" stroke="#2E7D32" stroke-width="2"/>
+        <text x="60" y="25" text-anchor="middle" fill="white" font-family="Arial">EV Sensor N</text>
+        <text x="60" y="45" text-anchor="middle" fill="white" font-family="Arial">(Battery)</text>
+    </g>
+
+    <!-- RabbitMQ -->
+    <g transform="translate(300,125)">
+        <rect x="0" y="0" width="150" height="100" rx="5" fill="#FF9800" stroke="#F57C00" stroke-width="2"/>
+        <text x="75" y="45" text-anchor="middle" fill="white" font-family="Arial">RabbitMQ</text>
+        <text x="75" y="65" text-anchor="middle" fill="white" font-family="Arial">Message Queue</text>
+    </g>
+
+    <!-- Python Consumer -->
+    <g transform="translate(550,125)">
+        <rect x="0" y="0" width="150" height="100" rx="5" fill="#2196F3" stroke="#1976D2" stroke-width="2"/>
+        <text x="75" y="45" text-anchor="middle" fill="white" font-family="Arial">Python</text>
+        <text x="75" y="65" text-anchor="middle" fill="white" font-family="Arial">Consumer</text>
+    </g>
+
+    <!-- Redis -->
+    <g transform="translate(550,300)">
+        <rect x="0" y="0" width="150" height="60" rx="5" fill="#9C27B0" stroke="#7B1FA2" stroke-width="2"/>
+        <text x="75" y="35" text-anchor="middle" fill="white" font-family="Arial">Redis Cache</text>
+    </g>
+
+    <!-- FastAPI -->
+    <g transform="translate(300,300)">
+        <rect x="0" y="0" width="150" height="60" rx="5" fill="#3F51B5" stroke="#303F9F" stroke-width="2"/>
+        <text x="75" y="35" text-anchor="middle" fill="white" font-family="Arial">FastAPI Server</text>
+    </g>
+
+    <!-- Arrows -->
+    <!-- Sensors to RabbitMQ -->
+    <path d="M 170,80 L 290,175" fill="none" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <path d="M 170,180 L 290,175" fill="none" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <path d="M 170,280 L 290,175" fill="none" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+    
+    <!-- RabbitMQ to Consumer -->
+    <path d="M 450,175 L 540,175" fill="none" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+    
+    <!-- Consumer to Redis -->
+    <path d="M 625,225 L 625,290" fill="none" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+    
+    <!-- Redis to FastAPI -->
+    <path d="M 540,330 L 460,330" fill="none" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+    <!-- Arrow Marker -->
+    <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#666"/>
+        </marker>
+    </defs>
+
+    <!-- Labels -->
+    <g fill="#666" font-family="Arial" font-size="12">
+        <text x="200" y="100">Publish</text>
+        <text x="470" y="160">Subscribe</text>
+        <text x="635" y="260">Store</text>
+        <text x="480" y="350">Read</text>
+    </g>
+</svg>
