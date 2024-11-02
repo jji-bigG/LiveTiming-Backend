@@ -1,8 +1,8 @@
-import redis
+import redis.asyncio as redis
 import json
 from datetime import datetime
 from typing import List, Optional, Dict, Any
-from config import settings
+from core.config import settings
 import logging
 
 logger = logging.getLogger(__name__)
@@ -18,20 +18,42 @@ class RedisService:
         )
         self._test_connection()
 
-    def _test_connection(self):
+    async def _test_connection(self):
         try:
-            self.redis_client.ping()
+            await self.redis_client.ping()
             logger.info("Successfully connected to Redis")
         except redis.ConnectionError as e:
             logger.error(f"Failed to connect to Redis: {e}")
             raise
 
-    async def store_timing_data(self, device_id: str, data: Dict[str, Any]):
-        """Store timing data in Redis"""
-        key = f"timing:{device_id}"
+    def get_pubsub(self):
+        """Get Redis Pub/Sub connection"""
+        return self.redis_client.pubsub()
+
+    async def publish_timing_update(self, data: Dict[str, Any]):
+        """Publish timing update to Redis channel"""
         try:
+            message = json.dumps(data)
+            await self.redis_client.publish("timing_updates", message)
+        except Exception as e:
+            logger.error(f"Error publishing timing update: {e}")
+            raise
+
+    async def publish_sensor_update(self, data: Dict[str, Any]):
+        """Publish sensor update to Redis channel"""
+        try:
+            message = json.dumps(data)
+            await self.redis_client.publish("sensor_updates", message)
+        except Exception as e:
+            logger.error(f"Error publishing sensor update: {e}")
+            raise
+
+    async def store_timing_data(self, device_id: str, data: Dict[str, Any]):
+        """Store timing data and publish update"""
+        try:
+            key = f"timing:{device_id}"
             # Store latest lap time
-            self.redis_client.hset(
+            await self.redis_client.hset(
                 key,
                 mapping={
                     "latest_lap": data["lap_time"],
@@ -40,19 +62,24 @@ class RedisService:
             )
 
             # Update best lap if necessary
-            current_best = self.redis_client.hget(key, "best_lap")
+            current_best = await self.redis_client.hget(key, "best_lap")
             if not current_best or float(data["lap_time"]) < float(current_best):
-                self.redis_client.hset(key, "best_lap", data["lap_time"])
+                await self.redis_client.hset(key, "best_lap", data["lap_time"])
+
+            # Publish update
+            await self.publish_timing_update(
+                {"device_id": device_id, "type": "timing_update", "data": data}
+            )
 
         except Exception as e:
             logger.error(f"Error storing timing data: {e}")
             raise
 
     async def store_sensor_data(self, device_id: str, data: Dict[str, Any]):
-        """Store sensor data in Redis"""
-        key = f"sensor:{device_id}:{data['sensor_type']}"
+        """Store sensor data and publish update"""
         try:
-            self.redis_client.hset(
+            key = f"sensor:{device_id}:{data['sensor_type']}"
+            await self.redis_client.hset(
                 key,
                 mapping={
                     "latest_value": data["value"],
@@ -60,38 +87,14 @@ class RedisService:
                     "last_update": datetime.utcnow().isoformat(),
                 },
             )
+
+            # Publish update
+            await self.publish_sensor_update(
+                {"device_id": device_id, "type": "sensor_update", "data": data}
+            )
+
         except Exception as e:
             logger.error(f"Error storing sensor data: {e}")
             raise
 
-    async def get_timing_data(self, device_id: str) -> Optional[Dict[str, Any]]:
-        """Retrieve timing data for a specific device"""
-        key = f"timing:{device_id}"
-        try:
-            data = self.redis_client.hgetall(key)
-            if not data:
-                return None
-            return {
-                "device_id": device_id,
-                "latest_lap": float(data["latest_lap"]),
-                "best_lap": float(data["best_lap"]) if "best_lap" in data else None,
-                "last_update": datetime.fromisoformat(data["last_update"]),
-            }
-        except Exception as e:
-            logger.error(f"Error retrieving timing data: {e}")
-            raise
-
-    async def get_all_timing_data(self) -> List[Dict[str, Any]]:
-        """Retrieve timing data for all devices"""
-        try:
-            keys = self.redis_client.keys("timing:*")
-            result = []
-            for key in keys:
-                device_id = key.split(":")[1]
-                data = await self.get_timing_data(device_id)
-                if data:
-                    result.append(data)
-            return result
-        except Exception as e:
-            logger.error(f"Error retrieving all timing data: {e}")
-            raise
+    # ... rest of the Redis service methods ...
