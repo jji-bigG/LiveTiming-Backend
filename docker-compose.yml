@@ -1,43 +1,53 @@
 version: '3.8'
 
 services:
-  redis:
-    image: redis:latest
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    command: redis-server --save 60 1 --loglevel warning
-
-  rabbitmq:
-    image: rabbitmq:3-management
-    ports:
-      - "5672:5672"   # AMQP protocol port
-      - "15672:15672" # Management interface port
-    environment:
-      - RABBITMQ_DEFAULT_USER=livetiming
-      - RABBITMQ_DEFAULT_PASS=livetiming123
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
-
-  backend:
+  app:
     build: .
     ports:
       - "8000:8000"
     environment:
+      - PYTHONPATH=/app
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_PORT=5672
-      - RABBITMQ_USER=livetiming
-      - RABBITMQ_PASS=livetiming123
+      - RABBITMQ_USER=user
+      - RABBITMQ_PASS=password
     volumes:
-      - ./src:/app/src
+      - .:/app
     depends_on:
       - redis
       - rabbitmq
-    command: bash -c "python -m src.consumer & uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"
+    networks:
+      - ev-network
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - ev-network
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "5672:5672"   # AMQP protocol port
+      - "15672:15672" # Management interface port
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - ev-network
 
 volumes:
-  redis_data:
-  rabbitmq_data:
+  redis-data:
+  rabbitmq-data:
+
+networks:
+  ev-network:
+    driver: bridge

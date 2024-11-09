@@ -11,33 +11,34 @@ A scalable system for processing and storing electric vehicle sensor data using 
 ## 🏗️ Project Structure
 
 ```
-backend/
-├── docker-compose.yml          # Docker services configuration
-├── .gitignore                 # Git ignore rules
-├── README.md                  # This file
-├── Dockerfile                 # Backend service container config
-├── requirements.txt           # Python dependencies
-├── src/
-│   ├── __init__.py
-│   ├── main.py               # FastAPI application
-│   ├── consumer.py           # RabbitMQ consumer for sensor data
-│   ├── config.py             # Configuration settings
-│   ├── api/
-│   │   ├── __init__.py
-│   │   ├── routes/
-│   │   │   ├── __init__.py
-│   │   │   └── v1.py        # API endpoints
-│   │   └── models/
-│   │       ├── __init__.py
-│   │       └── schemas.py    # Data models
-│   └── services/
-│       ├── __init__.py
-│       ├── redis_service.py  # Redis client wrapper
-│       └── rabbitmq_service.py # RabbitMQ client wrapper
-└── tests/
+├── Dockerfile
+├── README.md
+├── docker-compose.yml
+├── docs
+│   └── architecture.svg
+├── setup.sh
+├── src
+│   ├── __init__.py
+│   ├── api
+│   │   ├── __init__.py
+│   │   └── routes
+│   │       ├── __init__.py
+│   │       ├── v1
+│   │       │   ├── __init__.py
+│   │       │   └── websocket.py
+│   │       └── v1.py
+│   ├── config.py
+│   ├── consumer.py
+│   ├── main.py
+│   ├── models
+│   │   ├── __init__.py
+│   │   └── schemas.py
+│   └── services
+│       ├── rabbitmq_service.py
+│       └── redis-service.py
+└── tests
     ├── __init__.py
-    ├── test_api.py
-    └── test_services.py
+    └── test_api.py
 ```
 
 ## 🔄 Data Flow
