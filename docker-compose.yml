@@ -43,6 +43,22 @@ services:
       - rabbitmq-data:/var/lib/rabbitmq
     networks:
       - ev-network
+  
+  data-loader:
+    build: ./data-loader
+    depends_on:
+      - redis
+      - rabbitmq
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=user
+      - RABBITMQ_PASS=password
+    networks:
+      - ev-network
+
 
 volumes:
   redis-data:
