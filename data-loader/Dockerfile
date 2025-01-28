@@ -8,3 +8,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 CMD ["python", "data_loader.py"]
+CMD ["python", "fetch-mq.py"]
