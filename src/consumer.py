@@ -59,7 +59,7 @@ class MessageConsumer:
 
             # Store in Redis
             self.loop.run_until_complete(
-                self.redis.store_sensor_data(message["device_id"], message)
+                self.redis.store_sensor_data(message["device_id"], message["sensor_type"], message)
             )
 
             # Acknowledge the message
